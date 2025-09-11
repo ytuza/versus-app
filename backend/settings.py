@@ -56,13 +56,18 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'backend.urls'
 
-CORS_ALLOW_ALL_ORIGINS = True
-
-# Para producción, usar estas configuraciones más específicas:
-# CORS_ALLOWED_ORIGINS = [
-#     "https://tu-usuario.github.io",  # URL de GitHub Pages
-#     "http://localhost:5173",  # Para desarrollo local
-# ]
+# CORS configuration
+import os
+if os.environ.get('RENDER'):
+    # Producción - URLs específicas
+    CORS_ALLOWED_ORIGINS = [
+        "https://ytuza.github.io",  # GitHub Pages
+        "http://localhost:5173",   # Desarrollo local
+    ]
+    CORS_ALLOW_ALL_ORIGINS = False
+else:
+    # Desarrollo local - permitir todo
+    CORS_ALLOW_ALL_ORIGINS = True
 
 TEMPLATES = [
     {
