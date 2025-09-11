@@ -1,0 +1,19 @@
+{
+  "name": "versus-app",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently -k \"npm:dev:*\"",
+    "dev:front": "npm --prefix frontend run dev",
+    "dev:back": "bash -lc 'source versus-app/bin/activate && python manage.py runserver 0.0.0.0:8001'"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.0",
+    "gh-pages": "^6.3.0"
+  },
+  "version": "1.0.0",
+  "main": "index.js",
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": ""
+}
