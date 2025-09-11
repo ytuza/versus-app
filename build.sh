@@ -2,6 +2,9 @@
 # exit on error
 set -o errexit
 
+# Establecer variable de entorno para indicar que estamos en Render
+export RENDER=1
+
 echo "🔧 Installing dependencies..."
 pip install -r requirements.txt
 
