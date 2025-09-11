@@ -33,7 +33,7 @@ DATABASES = {
 
 # CORS settings para producción
 CORS_ALLOWED_ORIGINS = [
-    "https://tu-usuario.github.io",  # Cambiar por tu usuario de GitHub
+    "https://ytuza.github.io",  # Cambiar por tu usuario de GitHub
     "http://localhost:5173",  # Para desarrollo local
     "http://127.0.0.1:5173",
 ]
