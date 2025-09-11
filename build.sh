@@ -6,6 +6,7 @@ set -o errexit
 export RENDER=1
 
 echo "🔧 Installing dependencies..."
+pip install --upgrade pip
 pip install -r requirements.txt
 
 echo "📁 Collecting static files..."
