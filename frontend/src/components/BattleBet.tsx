@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useBattles } from '../contexts/BattlesContext';
 import type { Battle } from '../types/battles';
 import { useCoins } from '../contexts/CoinsContext';
-import { useAuth } from '../contexts/AuthContext';
+// import { useAuth } from '../contexts/AuthContext';
 import { Coins, AlertCircle, CheckCircle, X } from 'lucide-react';
 
 interface BattleBetProps {
@@ -14,7 +14,7 @@ interface BattleBetProps {
 const BattleBet: React.FC<BattleBetProps> = ({ battle, onClose, onSuccess }) => {
   const { placeBet } = useBattles();
   const { coins } = useCoins();
-  const { user } = useAuth();
+  // const { user } = useAuth(); // Commented out unused variable
   
   const [influencerChoice, setInfluencerChoice] = useState<'a' | 'b' | null>(null);
   const [coinsAmount, setCoinsAmount] = useState<number>(1);

@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
 import { useBattles } from '../contexts/BattlesContext';
 import type { Battle } from '../types/battles';
-import { useAuth } from '../contexts/AuthContext';
+// import { useAuth } from '../contexts/AuthContext';
 import BattleBet from './BattleBet';
 import BattleResults from './BattleResults';
-import { Clock, Users, Coins, Trophy, AlertCircle, Eye } from 'lucide-react';
+import { Clock, Coins, Trophy, AlertCircle, Eye } from 'lucide-react';
 
 const BattlesList: React.FC = () => {
   const { battles, loading, error } = useBattles();
-  const { user } = useAuth();
+  // const { user } = useAuth(); // Commented out unused variable
   const [selectedBattle, setSelectedBattle] = useState<Battle | null>(null);
   const [selectedBattleForBet, setSelectedBattleForBet] = useState<Battle | null>(null);
   const [showResults, setShowResults] = useState<number | null>(null);

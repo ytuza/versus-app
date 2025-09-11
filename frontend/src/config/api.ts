@@ -3,7 +3,7 @@ const API_CONFIG = {
   // URL base del backend
   BASE_URL: import.meta.env.VITE_API_BASE_URL || 
            (import.meta.env.MODE === 'production' 
-             ? 'https://tu-app-backend.onrender.com'  // Cambiar por tu URL de Render
+             ? 'https://versus-app.onrender.com'
              : 'http://localhost:8001'),
              
   // Endpoints

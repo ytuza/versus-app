@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useBattles } from '../contexts/BattlesContext';
 import type { Battle } from '../types/battles';
 import { useAuth } from '../contexts/AuthContext';
-import { Clock, Trophy, Award, DollarSign, AlertCircle, Eye } from 'lucide-react';
+import { Clock, Trophy, AlertCircle, Eye } from 'lucide-react';
 import BattleResults from './BattleResults';
 
 const MyBattles: React.FC = () => {

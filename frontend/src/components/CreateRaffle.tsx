@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { useRaffles } from '../contexts/RafflesContext';
-import { useCoins } from '../contexts/CoinsContext';
+// import { useCoins } from '../contexts/CoinsContext';
 import { Gift, Target, FileText, Coins } from 'lucide-react';
 
 const CreateRaffle: React.FC = () => {
   const { createRaffle } = useRaffles();
-  const { coins } = useCoins();
+  // const { coins } = useCoins(); // Commented out unused variable
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);

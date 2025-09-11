@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useBattles } from '../contexts/BattlesContext';
 import { useAuth } from '../contexts/AuthContext';
-import { useCoins } from '../contexts/CoinsContext';
-import { Sword, Users, Clock, AlertCircle, CheckCircle, X } from 'lucide-react';
+// import { useCoins } from '../contexts/CoinsContext'; // Commented out unused import
+import { Sword, AlertCircle, CheckCircle } from 'lucide-react';
 import axios from 'axios';
 
 interface User {
@@ -107,10 +107,10 @@ const CreateBattle: React.FC = () => {
     }
   };
 
-  const getSelectedInfluencerName = (id: number | null) => {
-    const influencer = influencers.find(u => u.id === id);
-    return influencer ? `${influencer.first_name} ${influencer.last_name}` : 'Seleccionar influencer';
-  };
+  // const getSelectedInfluencerName = (id: number | null) => {
+  //   const influencer = influencers.find(u => u.id === id);
+  //   return influencer ? `${influencer.first_name} ${influencer.last_name}` : 'Seleccionar influencer';
+  // }; // Commented out unused function
 
   if (!user?.is_staff) {
     return (
