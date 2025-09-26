@@ -68,8 +68,8 @@ const Register: React.FC<RegisterProps> = ({ onSwitchToLogin }) => {
       <div className="max-w-md w-full space-y-8">
         {/* Logo/Brand */}
         <div className="text-center">
-          <div className="mx-auto h-16 w-16 bg-gradient-to-r from-primary-600 to-purple-600 rounded-2xl flex items-center justify-center mb-4">
-            <span className="text-white text-2xl font-bold">V</span>
+          <div className="mx-auto h-20 w-48 mb-4 flex items-center justify-center">
+            <img src="/versus-app/raqi-logo.png" alt="Raqi" className="h-full w-full object-contain" />
           </div>
           <h2 className="text-3xl font-bold text-gray-900 mb-2">
             Únete a nosotros
@@ -82,8 +82,8 @@ const Register: React.FC<RegisterProps> = ({ onSwitchToLogin }) => {
         <div className="bg-white rounded-2xl shadow-xl p-8 border border-gray-100">
           <form className="space-y-6" onSubmit={handleSubmit}>
             {error && (
-              <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl flex items-center">
-                <div className="w-2 h-2 bg-red-500 rounded-full mr-3"></div>
+              <div className="bg-primary-50 border border-primary-200 text-primary-700 px-4 py-3 rounded-xl flex items-center">
+                <div className="w-2 h-2 bg-primary-500 rounded-full mr-3"></div>
                 {error}
               </div>
             )}
@@ -176,17 +176,17 @@ const Register: React.FC<RegisterProps> = ({ onSwitchToLogin }) => {
                       <div className="flex-1 bg-gray-200 rounded-full h-2">
                         <div 
                           className={`h-2 rounded-full transition-all duration-300 ${
-                            strength.color === 'red' ? 'bg-red-500' :
-                            strength.color === 'yellow' ? 'bg-yellow-500' :
-                            'bg-green-500'
+                            strength.color === 'red' ? 'bg-primary-500' :
+                            strength.color === 'yellow' ? 'bg-accent-500' :
+                            'bg-secondary-500'
                           }`}
                           style={{ width: `${(strength.score / 3) * 100}%` }}
                         ></div>
                       </div>
                       <span className={`text-xs font-medium ${
-                        strength.color === 'red' ? 'text-red-600' :
-                        strength.color === 'yellow' ? 'text-yellow-600' :
-                        'text-green-600'
+                        strength.color === 'red' ? 'text-primary-600' :
+                        strength.color === 'yellow' ? 'text-accent-600' :
+                        'text-secondary-600'
                       }`}>
                         {strength.text}
                       </span>

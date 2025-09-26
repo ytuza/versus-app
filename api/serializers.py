@@ -59,21 +59,23 @@ class UserProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = UserProfile
-        fields = ['id', 'email', 'first_name', 'last_name', 'avatar_url', 'coins', 'is_staff', 'is_influencer', 'created_at']
+        fields = ['id', 'email', 'first_name', 'last_name', 'avatar_url', 'coins', 'is_staff', 'is_influencer', 'referral_code', 'created_at']
 
 class TransactionSerializer(serializers.ModelSerializer):
     user_email = serializers.EmailField(source='user.email', read_only=True)
     user_name = serializers.CharField(source='user.get_full_name', read_only=True)
     approved_by_email = serializers.EmailField(source='approved_by.email', read_only=True)
+    referrer_email = serializers.EmailField(source='referrer.email', read_only=True)
 
     class Meta:
         model = Transaction
         fields = [
             'id', 'user', 'user_email', 'user_name', 'amount', 'total_price', 
             'status', 'payment_image', 'created_at', 'updated_at', 
-            'approved_by', 'approved_by_email', 'admin_notes'
+            'approved_by', 'approved_by_email', 'admin_notes',
+            'referral_code_used', 'referrer', 'referrer_email'
         ]
-        read_only_fields = ['total_price', 'status', 'approved_by', 'approved_by_email', 'admin_notes']
+        read_only_fields = ['total_price', 'status', 'approved_by', 'approved_by_email', 'admin_notes', 'referrer']
 
     def validate_amount(self, value):
         if value <= 0:
@@ -83,31 +85,72 @@ class TransactionSerializer(serializers.ModelSerializer):
         return value
 
 class TransactionCreateSerializer(serializers.ModelSerializer):
+    referral_code = serializers.CharField(write_only=True, required=False, allow_blank=True)
+
     class Meta:
         model = Transaction
-        fields = ['amount', 'payment_image']
+        fields = ['amount', 'payment_image', 'referral_code']
 
-    def validate_amount(self, value):
-        if value <= 0:
-            raise serializers.ValidationError("La cantidad debe ser mayor a 0")
-        if value > 1000:
-            raise serializers.ValidationError("No puedes comprar más de 1000 coins por transacción")
-        return value
+    def validate(self, attrs):
+        # Validación general de amount
+        amount = attrs.get('amount')
+        if amount is None or amount <= 0:
+            raise serializers.ValidationError({'amount': "La cantidad debe ser mayor a 0"})
+        if amount > 1000:
+            raise serializers.ValidationError({'amount': "No puedes comprar más de 1000 coins por transacción"})
+
+        # Validaciones del código de referido
+        referral_code = attrs.get('referral_code')
+        request = self.context.get('request')
+        if referral_code is not None:
+            referral_code = referral_code.strip()
+            if referral_code:
+                # Buscar código case-insensitive
+                try:
+                    profile = UserProfile.objects.get(referral_code__iexact=referral_code)
+                except UserProfile.DoesNotExist:
+                    raise serializers.ValidationError({'referral_code': 'Código de referido inválido'})
+
+                # Bloquear uso propio
+                current_user = request.user if request else None
+                if current_user and profile.user_id == current_user.id:
+                    raise serializers.ValidationError({'referral_code': 'No puedes usar tu propio código de referido'})
+
+                # Guardar normalizados para create()
+                attrs['referral_code_normalized'] = profile.referral_code
+                attrs['referrer_user'] = profile.user
+        return attrs
+
+    def create(self, validated_data):
+        # Extraer campos auxiliares
+        referral_code_normalized = validated_data.pop('referral_code_normalized', None)
+        validated_data.pop('referral_code', None)
+        referrer_user = validated_data.pop('referrer_user', None)
+
+        # Crear transacción con los campos de referido
+        transaction = Transaction.objects.create(
+            referral_code_used=referral_code_normalized or '',
+            referrer=referrer_user,
+            **validated_data
+        )
+        return transaction
 
 class TransactionAdminSerializer(serializers.ModelSerializer):
     user_email = serializers.EmailField(source='user.email', read_only=True)
     user_name = serializers.CharField(source='user.get_full_name', read_only=True)
     approved_by_email = serializers.EmailField(source='approved_by.email', read_only=True)
+    referrer_email = serializers.EmailField(source='referrer.email', read_only=True)
 
     class Meta:
         model = Transaction
         fields = [
             'id', 'user', 'user_email', 'user_name', 'amount', 'total_price', 
             'status', 'payment_image', 'created_at', 'updated_at', 
-            'approved_by', 'approved_by_email', 'admin_notes'
+            'approved_by', 'approved_by_email', 'admin_notes',
+            'referral_code_used', 'referrer', 'referrer_email'
         ]
         read_only_fields = ['user', 'user_email', 'user_name', 'amount', 'total_price', 
-                           'payment_image', 'created_at', 'updated_at', 'approved_by_email']
+                           'payment_image', 'created_at', 'updated_at', 'approved_by_email', 'referrer']
 
 class UserCoinsSerializer(serializers.ModelSerializer):
     class Meta:

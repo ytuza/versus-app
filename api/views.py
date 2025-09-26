@@ -97,7 +97,7 @@ def user_coins(request):
 @permission_classes([IsAuthenticated])
 def create_transaction(request):
     """Crear una nueva transacción de compra de coins"""
-    serializer = TransactionCreateSerializer(data=request.data)
+    serializer = TransactionCreateSerializer(data=request.data, context={'request': request})
     if serializer.is_valid():
         # Crear la transacción asociada al usuario actual
         transaction = serializer.save(user=request.user)
@@ -107,6 +107,129 @@ def create_transaction(request):
             'transaction': full_serializer.data
         }, status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['GET'])
+@permission_classes([IsAdminUser])
+def admin_referrals_summary(request):
+    """Resumen agregado por código de referido (solo transacciones aprobadas).
+    Filtros opcionales: from=YYYY-MM-DD, to=YYYY-MM-DD
+    """
+    date_from = request.query_params.get('from')
+    date_to = request.query_params.get('to')
+
+    transactions = Transaction.objects.filter(status='approved', referrer__isnull=False)
+
+    # Aplicar filtros de fecha
+    if date_from:
+        try:
+            dt_from = timezone.datetime.fromisoformat(date_from)
+            transactions = transactions.filter(created_at__date__gte=dt_from.date())
+        except Exception:
+            return Response({'error': 'Formato de fecha inválido en from. Use YYYY-MM-DD'}, status=status.HTTP_400_BAD_REQUEST)
+    if date_to:
+        try:
+            dt_to = timezone.datetime.fromisoformat(date_to)
+            transactions = transactions.filter(created_at__date__lte=dt_to.date())
+        except Exception:
+            return Response({'error': 'Formato de fecha inválido en to. Use YYYY-MM-DD'}, status=status.HTTP_400_BAD_REQUEST)
+
+    # Agregaciones por referidor
+    aggregation = transactions.values('referrer', 'referrer__email', 'referrer__profile__referral_code') \
+        .annotate(
+            total_coins=models.Sum('amount'),
+            purchases_count=models.Count('id'),
+            total_soles=models.Sum('total_price')
+        ) \
+        .order_by('-total_coins')
+
+    data = []
+    for row in aggregation:
+        data.append({
+            'referrer_id': row['referrer'],
+            'referrer_email': row['referrer__email'],
+            'referral_code': row['referrer__profile__referral_code'],
+            'total_coins': row['total_coins'] or 0,
+            'purchases_count': row['purchases_count'] or 0,
+            'total_soles': str(row['total_soles'] or 0)
+        })
+
+    return Response({'results': data}, status=status.HTTP_200_OK)
+
+@api_view(['GET'])
+@permission_classes([IsAdminUser])
+def admin_referrals_detail(request, referrer_id):
+    """Detalle de compras aprobadas por un referidor específico"""
+    date_from = request.query_params.get('from')
+    date_to = request.query_params.get('to')
+
+    transactions = Transaction.objects.filter(status='approved', referrer_id=referrer_id)
+
+    if date_from:
+        try:
+            dt_from = timezone.datetime.fromisoformat(date_from)
+            transactions = transactions.filter(created_at__date__gte=dt_from.date())
+        except Exception:
+            return Response({'error': 'Formato de fecha inválido en from. Use YYYY-MM-DD'}, status=status.HTTP_400_BAD_REQUEST)
+    if date_to:
+        try:
+            dt_to = timezone.datetime.fromisoformat(date_to)
+            transactions = transactions.filter(created_at__date__lte=dt_to.date())
+        except Exception:
+            return Response({'error': 'Formato de fecha inválido en to. Use YYYY-MM-DD'}, status=status.HTTP_400_BAD_REQUEST)
+
+    serializer = TransactionAdminSerializer(transactions, many=True)
+    return Response(serializer.data, status=status.HTTP_200_OK)
+
+@api_view(['GET'])
+@permission_classes([IsAdminUser])
+def admin_referrals_csv(request):
+    """Exportar CSV del resumen de referidos"""
+    import csv
+    from django.http import HttpResponse
+
+    date_from = request.query_params.get('from')
+    date_to = request.query_params.get('to')
+
+    transactions = Transaction.objects.filter(status='approved', referrer__isnull=False)
+
+    if date_from:
+        try:
+            dt_from = timezone.datetime.fromisoformat(date_from)
+            transactions = transactions.filter(created_at__date__gte=dt_from.date())
+        except Exception:
+            return Response({'error': 'Formato de fecha inválido en from. Use YYYY-MM-DD'}, status=status.HTTP_400_BAD_REQUEST)
+    if date_to:
+        try:
+            dt_to = timezone.datetime.fromisoformat(date_to)
+            transactions = transactions.filter(created_at__date__lte=dt_to.date())
+        except Exception:
+            return Response({'error': 'Formato de fecha inválido en to. Use YYYY-MM-DD'}, status=status.HTTP_400_BAD_REQUEST)
+
+    aggregation = transactions.values('referrer', 'referrer__email', 'referrer__profile__referral_code') \
+        .annotate(
+            total_coins=models.Sum('amount'),
+            purchases_count=models.Count('id'),
+            total_soles=models.Sum('total_price')
+        ) \
+        .order_by('-total_coins')
+
+    # Crear respuesta CSV
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="referrals_summary.csv"'
+    writer = csv.writer(response)
+    writer.writerow(['referrer_id', 'referrer_email', 'referral_code', 'total_coins', 'purchases_count', 'total_soles'])
+
+    for row in aggregation:
+        writer.writerow([
+            row['referrer'],
+            row['referrer__email'],
+            row['referrer__profile__referral_code'],
+            row['total_coins'] or 0,
+            row['purchases_count'] or 0,
+            row['total_soles'] or 0,
+        ])
+
+    return response
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])

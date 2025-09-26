@@ -9,6 +9,7 @@ interface User {
   last_name: string;
   is_staff?: boolean;
   is_influencer?: boolean;
+  referral_code?: string;
 }
 
 interface AuthContextType {

@@ -185,6 +185,15 @@ const AdminTransactions: React.FC = () => {
                 {transaction.approved_by_email && (
                   <p>Procesado por: {transaction.approved_by_email}</p>
                 )}
+                {transaction.referral_code_used && (
+                  <p>
+                    Código referido: 
+                    <span className="font-mono font-semibold ml-1">{transaction.referral_code_used}</span>
+                    {transaction.referrer_email && (
+                      <span className="ml-2 text-xs text-gray-500">({transaction.referrer_email})</span>
+                    )}
+                  </p>
+                )}
                 {transaction.admin_notes && (
                   <div className="mt-2 p-2 bg-gray-50 rounded">
                     <p className="text-xs font-medium text-gray-700">Notas:</p>

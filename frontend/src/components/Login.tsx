@@ -60,8 +60,8 @@ const Login: React.FC<LoginProps> = ({ onSwitchToRegister }) => {
       <div className="max-w-md w-full space-y-8">
         {/* Logo/Brand */}
         <div className="text-center">
-          <div className="mx-auto h-16 w-16 bg-gradient-to-r from-primary-600 to-purple-600 rounded-2xl flex items-center justify-center mb-4">
-            <span className="text-white text-2xl font-bold">V</span>
+          <div className="mx-auto h-20 w-48 mb-4 flex items-center justify-center">
+            <img src="/versus-app/raqi-logo.png" alt="Raqi" className="h-full w-full object-contain" />
           </div>
           <h2 className="text-3xl font-bold text-gray-900 mb-2">
             Bienvenido de vuelta

@@ -13,13 +13,13 @@ const TransactionHistory: React.FC = () => {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'pending':
-        return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+        return 'bg-accent-100 text-accent-800 border-accent-200';
       case 'approved':
-        return 'bg-green-100 text-green-800 border-green-200';
+        return 'bg-secondary-100 text-secondary-800 border-secondary-200';
       case 'rejected':
-        return 'bg-red-100 text-red-800 border-red-200';
+        return 'bg-primary-100 text-primary-800 border-primary-200';
       default:
-        return 'bg-gray-100 text-gray-800 border-gray-200';
+        return 'bg-accent-100 text-accent-800 border-accent-200';
     }
   };
 
@@ -110,6 +110,14 @@ const TransactionHistory: React.FC = () => {
                 <p>Fecha: {formatDate(transaction.created_at)}</p>
                 {transaction.updated_at !== transaction.created_at && (
                   <p>Actualizado: {formatDate(transaction.updated_at)}</p>
+                )}
+                {transaction.referral_code_used && (
+                  <p>
+                    Código referido: <span className="font-mono font-semibold">{transaction.referral_code_used}</span>
+                    {transaction.referrer_email && (
+                      <span className="ml-2 text-xs text-gray-500">({transaction.referrer_email})</span>
+                    )}
+                  </p>
                 )}
                 {transaction.approved_by_email && (
                   <p>Procesado por: {transaction.approved_by_email}</p>

@@ -11,7 +11,8 @@ from api.views import (
     battle_results, battle_result_detail, admin_influencers, process_battles,
     raffles_list, create_raffle, raffle_detail, participate_raffle,
     my_raffle_participations, raffle_participations, completed_raffles,
-    process_raffle, processed_raffles
+    process_raffle, processed_raffles,
+    admin_referrals_summary, admin_referrals_detail, admin_referrals_csv
 )
 
 urlpatterns = [
@@ -31,6 +32,11 @@ urlpatterns = [
     path("api/admin/transactions/", admin_transactions),
     path("api/admin/transactions/<int:transaction_id>/approve/", approve_transaction),
     path("api/admin/transactions/<int:transaction_id>/reject/", reject_transaction),
+
+    # Admin referrals
+    path("api/admin/referrals/summary/", admin_referrals_summary),
+    path("api/admin/referrals/<int:referrer_id>/detail/", admin_referrals_detail),
+    path("api/admin/referrals/summary.csv", admin_referrals_csv),
     
     # URLs para batallas
     path("api/battles/", battles_list),

@@ -18,6 +18,9 @@ interface Transaction {
   approved_by?: number;
   approved_by_email?: string;
   admin_notes?: string;
+  referral_code_used?: string;
+  referrer?: number;
+  referrer_email?: string;
 }
 
 interface CoinsContextType {
@@ -27,7 +30,7 @@ interface CoinsContextType {
   error: string | null;
   fetchCoins: () => Promise<void>;
   fetchTransactions: () => Promise<void>;
-  createTransaction: (amount: number, paymentImage: File) => Promise<void>;
+  createTransaction: (amount: number, paymentImage: File, referralCode?: string) => Promise<void>;
   adminTransactions: Transaction[];
   adminLoading: boolean;
   fetchAdminTransactions: () => Promise<void>;
@@ -88,7 +91,7 @@ export const CoinsProvider: React.FC<CoinsProviderProps> = ({ children }) => {
     }
   };
 
-  const createTransaction = async (amount: number, paymentImage: File) => {
+  const createTransaction = async (amount: number, paymentImage: File, referralCode?: string) => {
     if (!token) return;
     
     try {
@@ -98,6 +101,9 @@ export const CoinsProvider: React.FC<CoinsProviderProps> = ({ children }) => {
       const formData = new FormData();
       formData.append('amount', amount.toString());
       formData.append('payment_image', paymentImage);
+      if (referralCode && referralCode.trim()) {
+        formData.append('referral_code', referralCode.trim().toUpperCase());
+      }
       
       const response = await axios.post('/api/transactions/', formData, {
         headers: {
@@ -113,6 +119,7 @@ export const CoinsProvider: React.FC<CoinsProviderProps> = ({ children }) => {
       console.error('Error creating transaction:', error);
       const errorMessage = error.response?.data?.amount?.[0] || 
                           error.response?.data?.payment_image?.[0] || 
+                          error.response?.data?.referral_code?.[0] ||
                           'Error al crear la transacción';
       setError(errorMessage);
       throw new Error(errorMessage);

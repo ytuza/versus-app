@@ -65,13 +65,13 @@ const RafflesList: React.FC = () => {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'active':
-        return 'bg-green-100 text-green-800';
+        return 'bg-secondary-100 text-secondary-800';
       case 'completed':
-        return 'bg-blue-100 text-blue-800';
+        return 'bg-primary-100 text-primary-800';
       case 'processed':
-        return 'bg-yellow-100 text-yellow-800';
+        return 'bg-accent-100 text-accent-800';
       default:
-        return 'bg-gray-100 text-gray-800';
+        return 'bg-accent-100 text-accent-800';
     }
   };
 
@@ -80,18 +80,18 @@ const RafflesList: React.FC = () => {
   if (loading) {
     return (
       <div className="flex justify-center items-center py-12">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="bg-red-50 border border-red-200 rounded-lg p-6">
-        <p className="text-red-800">{error}</p>
+      <div className="bg-primary-50 border border-primary-200 rounded-lg p-6">
+        <p className="text-primary-800">{error}</p>
         <button
           onClick={() => fetchRaffles()}
-          className="mt-4 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700"
+          className="mt-4 bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700"
         >
           Reintentar
         </button>
@@ -104,7 +104,7 @@ const RafflesList: React.FC = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-3">
-          <div className="p-2 bg-purple-100 rounded-lg">
+          <div className="p-2 bg-secondary-100 rounded-lg">
             <Gift className="w-6 h-6 text-purple-600" />
           </div>
           <div>
@@ -121,8 +121,8 @@ const RafflesList: React.FC = () => {
               onClick={() => setStatusFilter(status)}
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                 statusFilter === status
-                  ? 'bg-purple-600 text-white'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  ? 'bg-secondary-600 text-white'
+                  : 'bg-accent-100 text-accent-700 hover:bg-accent-200'
               }`}
             >
               {getStatusText(status)}

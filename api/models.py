@@ -3,6 +3,7 @@ from django.contrib.auth.models import AbstractUser
 from django.contrib.auth.base_user import BaseUserManager
 from django.utils import timezone
 import random
+import string
 
 class CustomUserManager(BaseUserManager):
     def create_user(self, email, password=None, **extra_fields):
@@ -43,9 +44,25 @@ class UserProfile(models.Model):
     is_influencer = models.BooleanField(default=False)  # Rol de influencer
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    referral_code = models.CharField(max_length=6, unique=True, null=True, blank=True, db_index=True)
 
     def __str__(self):
         return f"{self.user.email} - Profile ({self.coins} coins, Influencer: {self.is_influencer})"
+
+    def save(self, *args, **kwargs):
+        # Generar un código de referido corto y único si no existe
+        if not self.referral_code:
+            self.referral_code = self.generate_unique_referral_code()
+        super().save(*args, **kwargs)
+
+    @staticmethod
+    def generate_unique_referral_code():
+        """Genera un código de referido de 6 caracteres (A-Z, 0-9) único."""
+        alphabet = string.ascii_uppercase + string.digits
+        while True:
+            code = ''.join(random.choices(alphabet, k=6))
+            if not UserProfile.objects.filter(referral_code=code).exists():
+                return code
 
 class Transaction(models.Model):
     STATUS_CHOICES = [
@@ -70,6 +87,16 @@ class Transaction(models.Model):
         help_text='Admin que aprobó/rechazó la transacción'
     )
     admin_notes = models.TextField(blank=True, help_text='Notas del admin sobre la transacción')
+    # Referidos
+    referral_code_used = models.CharField(max_length=6, blank=True, default='', help_text='Código de referido utilizado')
+    referrer = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='referred_purchases',
+        help_text='Usuario dueño del código de referido'
+    )
 
     class Meta:
         ordering = ['-created_at']

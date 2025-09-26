@@ -111,7 +111,14 @@ export const RafflesProvider: React.FC<RafflesProviderProps> = ({ children }) =>
 
     if (!response.ok) {
       const errorData = await response.json();
-      throw new Error(errorData.error || 'Error al participar en el sorteo');
+      // Handle Django REST Framework error format
+      let errorMessage = 'Error al participar en el sorteo';
+      if (errorData.non_field_errors && errorData.non_field_errors.length > 0) {
+        errorMessage = errorData.non_field_errors[0];
+      } else if (errorData.error) {
+        errorMessage = errorData.error;
+      }
+      throw new Error(errorMessage);
     }
 
     await fetchRaffles(); // Refresh the list
